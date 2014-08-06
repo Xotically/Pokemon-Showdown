@@ -1,0 +1,91 @@
+/*Header*/
+#header{
+background:url("http://i.imgur.com/CRUO8F9.png")
+}
+/*Main BG*/
+body {
+background-image:url('http://imgur.com/n8IdpTx.png');
+background-repeat:no-repeat;
+background-position:center fixed;
+}
+
+
+/*PM Box*/
+.pm-log {
+min-height: 100px;
+max-height: 300px;
+background: url(http://www.pageresource.com/wallpapers/wallpaper/abstract-black-images_373729.jpg) center top scroll;
+color: #ffffff;
+word-wrap: break-word;
+overflow: auto;
+border: 0px solid #000000;
+border-top-left-radius: 0px;
+border-top-right-radius: 0px;
+}
+.pm-window h3 {
+    background: #181616;
+   border: 2px;
+}
+.pm-window.focused h3, .pm-window.focused h3:hover {
+background: #cbc8c8;
+border: 2px;
+}
+.pm-log-add {
+        background: #404040;
+   border: 2px;
+     border-color: #000;
+}
+
+/*Chat*/
+.chat-log {
+     font-size: 10pt;
+     background: url("") repeat;
+     opacity: 1;
+     border-left: 1px solid rgb(95, 200, 255);
+     overflow: auto;
+}
+
+
+.userbar{
+border:1px solid #00FFFF;
+padding:5px;
+background: #00FFFF;
+margin-top:-5px
+}
+
+/*"Look for a battle" buttons (when hovered over)*/
+.menugroup .button:hover {
+    background: #00FFFF;
+   color: #cccccc
+}
+
+/*"Look for a battle" buttons*/
+.menugroup .button {
+     background: #cccccc;
+   color: #00FFFF
+}
+
+
+.userlist {
+  background: #00FFFF;
+  color: #fff;
+  border: 1px solid;
+}
+
+.tabbar a.button.cur,.tabbar a.button.cur:hover {
+color: #00FFFF;
+text-shadow:none;
+   border: 2px;
+background: #cccccc;
+cursor: default;
+}
+
+.tabbar a.button {
+background: #3b3b3b;
+color: #cccccc;
+}
+
+.char {
+  background: url(http://fc09.deviantart.net/fs71/f/2012/275/7/7/black_and_grey_stripe_pattern_by_wiizkiid-d5gm6uv.png) center;
+  color: #eff;
+  }
