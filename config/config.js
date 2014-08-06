@@ -144,20 +144,7 @@ exports.customavatars = {
 	'championiyan': 'championiyan.png',
 	'e4fernboy': 'e4fernboy.png',
 	'e4': 'pixie.gif',
-	'afterforever': 'pixie.gif',
-	'cacelyn': 'pixie.gif',
-	'nylecac': 'pixie.gif',
-	'stevoduhhero': 'stevo.png',
-	'govhook': 'stevo.png',
-	'creaturephil': 'phil.gif',
-	'bootybot': 'butox.png',
-	'starrywindy': 'starry.gif',
-	'anrindas': 'anrin.png',
-	'mccullum': 'indiechari.jpg',
-	'AshKetchumadmn': 'indiechari.jpg',
-	'IndianCharizard': 'indiechari.jpg',
-	'ltinips': 'nippleguy.jpg',
-	'amillionnipples': 'nippleguy.jpg',
+	
 };
 
 // appealurl - specify a URL containing information on how users can appeal
