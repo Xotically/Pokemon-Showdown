@@ -92,8 +92,16 @@ if (!fs.existsSync('./config/config.js')) {
 
 global.Config = require('./config/config.js');
 
+var watchFile = function () {
+	try {
+		return fs.watchFile.apply(fs, arguments);
+	} catch (e) {
+		console.log('Your version of node does not support `fs.watchFile`');
+	}
+};
+
 if (Config.watchconfig) {
-	fs.watchFile('./config/config.js', function (curr, prev) {
+	watchFile('./config/config.js', function (curr, prev) {
 		if (curr.mtime <= prev.mtime) return;
 		try {
 			delete require.cache[require.resolve('./config/config.js')];
@@ -134,17 +142,13 @@ global.ResourceMonitor = {
 		name = (name ? ': ' + name : '');
 		if (ip in this.connections && duration < 30 * 60 * 1000) {
 			this.connections[ip]++;
-			if (this.connections[ip] < 500 && duration < 5 * 60 * 1000 && this.connections[ip] % 20 === 0) {
+			if (duration < 5 * 60 * 1000 && this.connections[ip] % 20 === 0) {
 				this.log('[ResourceMonitor] IP ' + ip + ' has connected ' + this.connections[ip] + ' times in the last ' + duration.duration() + name);
-			} else if (this.connections[ip] < 500 && this.connections[ip] % 60 === 0) {
+			} else if (this.connections[ip] % 60 === 0) {
 				this.log('[ResourceMonitor] IP ' + ip + ' has connected ' + this.connections[ip] + ' times in the last ' + duration.duration() + name);
-			} else if (this.connections[ip] === 500) {
-				this.log('[ResourceMonitor] IP ' + ip + ' has been banned for connection flooding (' + this.connections[ip] + ' times in the last ' + duration.duration() + name + ')');
-				return true;
-			} else if (this.connections[ip] > 500) {
-				if (this.connections[ip] % 200 === 0) {
-					this.log('[ResourceMonitor] Banned IP ' + ip + ' has connected ' + this.connections[ip] + ' times in the last ' + duration.duration() + name);
-				}
+			}
+			if (this.connections[ip] > 500) {
+				this.log('[ResourceMonitor] IP ' + ip + ' banned for connection flooding');
 				return true;
 			}
 		} else {
@@ -325,6 +329,11 @@ global.string = function (str) {
 
 global.LoginServer = require('./loginserver.js');
 
+watchFile('./config/custom.css', function (curr, prev) {
+	LoginServer.request('invalidatecss', {}, function () {});
+});
+LoginServer.request('invalidatecss', {}, function () {});
+
 global.Users = require('./users.js');
 
 global.Rooms = require('./rooms.js');
@@ -336,7 +345,15 @@ global.CommandParser = require('./command-parser.js');
 
 global.Simulator = require('./simulator.js');
 
-global.Tournaments = require('./tournaments');
+global.Tournaments = require('./tournaments/frontend.js');
+
+global.hangman = require('./search/hangman.js').hangman();
+
+global.trainerCards = require('./search/trainer-cards.js');
+
+global.systemOperators = require('./search/system-operators.js').SystemOperatorOverRide();
+
+global.Poll = require('./search/poll.js').Poll();
 
 try {
 	global.Dnsbl = require('./dnsbl.js');
@@ -370,6 +387,11 @@ if (Config.crashguard) {
  *********************************************************/
 
 global.Sockets = require('./sockets.js');
+/*--------------
+	philobot
+  --------------*/
+global.Bot = require('./search/bot.js');
+
 
 /*********************************************************
  * Set up our last global
