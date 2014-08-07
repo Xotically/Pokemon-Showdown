@@ -23,11 +23,11 @@ exports.Formats = [
 		ruleset: ['Random Battle']
 	},
 	{
-		name: "OU",
+		name: "OU (suspect test)",
 		section: "XY Singles",
 
 		ruleset: ['Pokemon', 'Standard', 'Team Preview', 'Swagger Clause', 'Baton Pass Clause'],
-		banlist: ['Uber', 'Soul Dew', 'Gengarite', 'Kangaskhanite', 'Lucarionite']
+		banlist: ['Uber', 'Soul Dew', 'Gengarite', 'Kangaskhanite', 'Lucarionite', 'Mawilite']
 	},
 	{
 		name: "Ubers",
