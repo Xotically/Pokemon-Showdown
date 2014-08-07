@@ -825,6 +825,80 @@ Users.users[i].send(message);
 },
 
 
+openshop: function(target, room, user) {
+		if (!user.can('hotpatch')) return this.sendReply('You do not have enough authority to do this.');
+
+		if (!closeShop && closedShop === 1) closedShop--;
+
+		if (!closeShop) {
+			return this.sendRepy('The shop is already closed. Use /closeshop to close the shop to buyers.');
+		}
+		else if (closeShop) {
+			if (closedShop === 0) {
+				this.sendReply('Are you sure you want to open the shop? People will be able to buy again. If you do, use the command again.');
+				closedShop++;
+			}
+			else if (closedShop === 1) {
+				closeShop = false;
+				closedShop--;
+				this.add('|raw|<center><h4><b>The shop has been opened, you can now buy from the shop.</b></h4></center>');
+			}
+		}
+	},
+
+
+lockshop: 'closeshop',
+	closeshop: function(target, room, user) {
+		if (!user.can('hotpatch')) return this.sendReply('You do not have enough authority to do this.');
+
+		if(closeShop && closedShop === 1) closedShop--;
+
+		if (closeShop) {
+			return this.sendReply('The shop is already closed. Use /openshop to open the shop to buyers.');
+		}
+		else if (!closeShop) {
+			if (closedShop === 0) {
+				this.sendReply('Are you sure you want to close the shop? People will not be able to buy anything. If you do, use the command again.');
+				closedShop++;
+			}
+			else if (closedShop === 1) {
+				closeShop = true;
+				closedShop--;
+				this.add('|raw|<center><h4><b>The shop has been temporarily closed, during this time you cannot buy items.</b></h4></center>');
+			}
+		}
+	},
+
+	openshop: function(target, room, user) {
+		if (!user.can('hotpatch')) return this.sendReply('You do not have enough authority to do this.');
+
+		if (!closeShop && closedShop === 1) closedShop--;
+
+		if (!closeShop) {
+			return this.sendRepy('The shop is already closed. Use /closeshop to close the shop to buyers.');
+		}
+		else if (closeShop) {
+			if (closedShop === 0) {
+				this.sendReply('Are you sure you want to open the shop? People will be able to buy again. If you do, use the command again.');
+				closedShop++;
+			}
+			else if (closedShop === 1) {
+				closeShop = false;
+				closedShop--;
+				this.add('|raw|<center><h4><b>The shop has been opened, you can now buy from the shop.</b></h4></center>');
+			}
+		}
+	},
+
+
+
+	
+	
+	
+	
+
+
+
 
 
 
@@ -1529,6 +1603,52 @@ unlockroom: function(target, room, user) {
 		targetUser.mute(room.id, 60 * 60 * 1000, true);
 	},
 
+	
+dmute : 'daymute',
+	daymute: function(target, room, user) {
+		if (!target) return this.parse('/help hourmute');
+
+		target = this.splitTarget(target);
+		var targetUser = this.targetUser;
+		if (!targetUser) {
+			return this.sendReply('User '+this.targetUsername+' not found.');
+		}
+		if (target.length > MAX_REASON_LENGTH) {
+			return this.sendReply('The reason is too long. It cannot exceed ' + MAX_REASON_LENGTH + ' characters.');
+		}
+		if (!this.can('mute', targetUser, room)) return false;
+		if (targetUser.punished) return this.sendReply(targetUser.name+' has recently been warned, muted, or locked. Please wait a few seconds before muting them.');
+		if (targetUser.mutedRooms[room.id] || targetUser.locked || !targetUser.connected) {
+			var problem = ' but was already '+(!targetUser.connected ? 'offline' : targetUser.locked ? 'locked' : 'muted');
+			if (!target && !room.auth) {
+				return this.privateModCommand('('+targetUser.name+' would be muted by '+user.name+problem+'.)');
+			}
+			return this.addModCommand(''+targetUser.name+' would be muted by '+user.name+problem+'.' + (target ? " (" + target + ")" : ""));
+		}
+		targetUser.punished = true;
+		targetUser.punishTimer = setTimeout(function(){
+			targetUser.punished = false;
+		},7000);
+		targetUser.popup(user.name+' has muted you for 24 hours. '+target);
+		this.addModCommand(''+targetUser.name+' was muted by '+user.name+' for 24 hours.' + (target ? " (" + target + ")" : ""));
+		var alts = targetUser.getAlts();
+		if (alts.length) this.privateModCommand("(" + targetUser.name + "'s alts were also muted: " + alts.join(", ") + ")");
+		this.add('|unlink|' + this.getLastIdOf(targetUser));
+
+		targetUser.mute(room.id, 60 * 60 * 1000, true);
+		try {
+			frostcommands.addMuteCount(user.userid);
+		} catch (e) {
+			return;
+		}
+	},	
+	
+	
+	
+	
+	
+	
+	
 	um: 'unmute',
 	unmute: function (target, room, user) {
 		if (!target) return this.parse('/help unmute');
@@ -1625,6 +1745,52 @@ unlockroom: function(target, room, user) {
 		targetUser.ban();
 	},
 
+	
+bh: 'banhammer',
+	banhammer: function(target, room, user) {
+		if (!target) return this.parse('/help ban');
+
+		target = this.splitTarget(target);
+		var targetUser = this.targetUser;
+		if (!targetUser) {
+			return this.sendReply('User '+this.targetUsername+' not found.');
+		}
+		if (target.length > MAX_REASON_LENGTH) {
+			return this.sendReply('The reason is too long. It cannot exceed ' + MAX_REASON_LENGTH + ' characters.');
+		}
+		if (!this.can('ban', targetUser)) return false;
+
+		if (Users.checkBanned(targetUser.latestIp) && !target && !targetUser.connected) {
+			var problem = ' but was already banned';
+			return this.privateModCommand('('+targetUser.name+' would be banned by '+user.name+problem+'.)');
+		}
+
+		targetUser.popup(user.name+" has has hit you with their ban hammer." + (config.appealurl ? ("  If you feel that your banning was unjustified you can appeal the ban:\n" + config.appealurl) : "") + "\n\n"+target);
+
+		this.addModCommand(""+targetUser.name+" was hit by "+user.name+"\'s ban hammer." + (target ? " (" + target + ")" : ""), ' ('+targetUser.latestIp+')');
+		var alts = targetUser.getAlts();
+		if (alts.length) {
+			this.addModCommand(""+targetUser.name+"'s alts were also hit: "+alts.join(", "));
+			for (var i = 0; i < alts.length; ++i) {
+				this.add('|unlink|' + toId(alts[i]));
+			}
+		}
+
+		this.add('|unlink|' + targetUser.userid);
+		targetUser.ban();
+	},	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 lockdt: 'lockdetails',
 	lockdetails: function (target, room, user) {
@@ -1824,16 +1990,106 @@ lockdt: 'lockdetails',
 		}
 	},
 
-	declare: function (target, room, user) {
+	
+declaregreen: 'declare',
+	declarered: 'declare',
+	declare: function(target, room, user, connection, cmd) {
+		/*if (user.userid === 'shadowninjask') return false;**/
 		if (!target) return this.parse('/help declare');
 		if (!this.can('declare', null, room)) return false;
 
 		if (!this.canTalk()) return;
 
-		this.add('|raw|<div class="broadcast-blue"><b>' + Tools.escapeHTML(target) + '</b></div>');
-		this.logModCommand(user.name + " declared " + target);
+		if (cmd === 'declare') {
+			this.add('|raw|<div class="broadcast-blue"><b>'+target+'</b></div>');
+		}
+		else if (cmd === 'declarered') {
+			this.add('|raw|<div class="broadcast-red"><b>'+target+'</b></div>');
+		}
+		else if (cmd === 'declaregreen') {
+			this.add('|raw|<div class="broadcast-green"><b>'+target+'</b></div>');
+		}
+		this.logModCommand(user.name+' declared '+target);
 	},
 
+	gdeclarered: 'gdeclare',
+	gdeclaregreen: 'gdeclare',
+	gdeclare: function(target, room, user, connection, cmd) {
+		if (!target) return this.parse('/help '+cmd);
+		if (!this.can('gdeclare')) return false;
+		var staff = '';
+		staff = 'a ' + Config.groups[user.group].name;
+		if (user.group == '~') staff = 'an Administrator';
+		if (user.frostDev) staff = 'a Developer';
+
+		//var roomName = (room.isPrivate)? 'a private room' : room.id;
+
+		if (cmd === 'gdeclare'){
+			for (var id in Rooms.rooms) {
+				if (id !== 'global' && !Rooms.rooms[id].blockGlobalDeclares) Rooms.rooms[id].addRaw('<div class="broadcast-blue"><b><font size=1><i>Global declare from '+staff+'<br /></i></font size>'+target+'</b></div>');
+			}
+		}
+		if (cmd === 'gdeclarered'){
+			for (var id in Rooms.rooms) {
+				if (id !== 'global' && !Rooms.rooms[id].blockGlobalDeclares) Rooms.rooms[id].addRaw('<div class="broadcast-red"><b><font size=1><i>Global declare from '+staff+'<br /></i></font size>'+target+'</b></div>');
+			}
+		}
+		else if (cmd === 'gdeclaregreen'){
+			for (var id in Rooms.rooms) {
+				if (id !== 'global' && !Rooms.rooms[id].blockGlobalDeclares) Rooms.rooms[id].addRaw('<div class="broadcast-green"><b><font size=1><i>Global declare from '+staff+'<br /></i></font size>'+target+'</b></div>');
+			}
+		}
+		this.logModCommand(user.name + " globally declared " + target);
+	},
+	
+	pgdeclare: function(target, room, user) {
+		if (!target) return this.parse('/help pgdeclare');
+		if (!this.can('pgdeclare')) return;
+
+		if (!this.canTalk()) return;
+
+		for (var r in Rooms.rooms) {
+			if (Rooms.rooms[r].type === 'chat' && !Rooms.rooms[r].blockGlobalDeclares) Rooms.rooms[r].add('|raw|<b>'+target+'</b></div>');
+		}
+
+		this.logModCommand(user.name+' declared '+target+' to all rooms.');
+	},
+
+	staffdeclare: 'declaremod',
+	modmsg: 'declaremod',
+	moddeclare: 'declaremod',
+	declaremod: function(target, room, user) {
+		if (!target) return this.sendReply('/declaremod [message] - Also /moddeclare and /modmsg');
+		if (!this.can('declare', null, room)) return false;
+
+		if (!this.canTalk()) return;
+
+		this.privateModCommand('|raw|<div class="broadcast-red"><b><font size=1><i>Global declare from '+user.name+'<br /></i></font size>'+target+'</b></div>');
+
+		this.logModCommand(user.name+' mod declared '+target);
+	},
+
+	cdeclare: 'chatdeclare',
+	chatdeclare: function (target, room, user) {
+		if (!target) return this.parse('/help chatdeclare');
+		if (!this.can('gdeclare')) return false;
+
+		for (var id in Rooms.rooms) {
+			if (id !== 'global') if (Rooms.rooms[id].type !== 'battle' && !Rooms.rooms[id].blockGlobalDeclares) Rooms.rooms[id].addRaw('<div class="broadcast-blue"><b>'+target+'</b></div>');
+		}
+		this.logModCommand(user.name + " globally declared (chat level) " + target);
+	},
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	htmldeclare: function (target, room, user) {
 		if (!target) return this.parse('/help htmldeclare');
 		if (!this.can('gdeclare', null, room)) return false;
@@ -1844,7 +2100,7 @@ lockdt: 'lockdetails',
 		this.logModCommand(user.name + " declared " + target);
 	},
 
-	gdeclare: 'globaldeclare',
+	gglobaldeclare: 'globaldeclare',
 	globaldeclare: function (target, room, user) {
 		if (!target) return this.parse('/help globaldeclare');
 		if (!this.can('gdeclare')) return false;
@@ -1910,6 +2166,36 @@ inactiverooms: function(target, room, user, connection) {
 		}
 	},	
 	
+
+
+roomlist: function(target, room, user, connection) {
+		if (!user.can('makeroom')) return false;
+			for (var u in Rooms.rooms) {
+				if (Rooms.rooms[u].type === "chat") {
+					if (!Rooms.rooms[u].active && !Rooms.rooms[u].isPrivate) {
+						connection.sendTo(room.id, '|raw|INACTIVE: <font color=red><b>'+u+'</b></font>');
+					}
+					if (Rooms.rooms[u].isPrivate && Rooms.rooms[u].active) {
+						connection.sendTo(room.id, '|raw|PRIVATE: <b>'+u+'</b>');
+					}
+					if (!Rooms.rooms[u].active && Rooms.rooms[u].isPrivate) {
+						connection.sendTo(room.id, '|raw|INACTIVE and PRIVATE: <font color=red><b>'+u+'</font></b>');
+					}
+					if (Rooms.rooms[u].active && !Rooms.rooms[u].isPrivate) {
+						connection.sendTo(room.id, '|raw|<font color=green>'+u+'</font>');
+					}
+				}
+			}
+		},
+
+
+
+
+
+
+
+
+
 	
 	
 	
@@ -2180,7 +2466,7 @@ eating: 'away',
 			//user will be authenticated
 			user.authenticated = true;
 			
-			if (user.isStaff) this.add('|raw|-- <b><font color="#088cc7">' + newName + '</font color></b> is no longer away.');
+			if (user.isStaff) this.add('|raw|-- <b><font color="#7FFF00">' + newName + '</font color></b> is no longer away.');
 
 			user.originalName = '';
 			user.isAway = false;
