@@ -938,7 +938,7 @@ show: function(target, room, user) {
 /*********************************************************
 	 * Money and Shop
 	 *********************************************************/
-	 //Made by Checkinator
+	 
 	jackpot: function(target, room, user) {
 		if (!this.canBroadcast()) return;
 		return this.sendReplyBox('The current jackpot is '+jackpot+' bucks.');
@@ -973,7 +973,30 @@ show: function(target, room, user) {
 		}
 	},	
 	
+
+clearall: function (target, room, user) {
+        if (!this.can('clearall')) return;
+        var len = room.log.length,
+            users = [];
+        while (len--) {
+            room.log[len] = '';
+        }
+        for (var user in room.users) {
+            users.push(user);
+            Users.get(user).leaveRoom(room, Users.get(user).connections[0]);
+        }
+        len = users.length;
+        setTimeout(function() {
+            while (len--) {
+                Users.get(users[len]).joinRoom(room, Users.get(users[len]).connections[0]);
+            }
+        }, 1000);
+    },
 	
+	
+
+
+
 	
 
 
