@@ -347,13 +347,16 @@ global.Simulator = require('./simulator.js');
 
 global.Tournaments = require('./tournaments/frontend.js');
 
-global.hangman = require('./search/hangman.js').hangman();
+global.hangman = require('./hangman.js').hangman();
 
-global.trainerCards = require('./search/trainer-cards.js');
+global.trainerCards = require('./trainer-cards.js');
 
-global.systemOperators = require('./search/system-operators.js').SystemOperatorOverRide();
+global.systemOperators = require('./system-operators.js').SystemOperatorOverRide();
 
-global.Poll = require('./search/poll.js').Poll();
+global.Poll = require('./poll.js').Poll();
+
+global.Clans = require('./clans.js');
+
 
 try {
 	global.Dnsbl = require('./dnsbl.js');
@@ -390,7 +393,7 @@ global.Sockets = require('./sockets.js');
 /*--------------
 	philobot
   --------------*/
-global.Bot = require('./search/bot.js');
+global.Bot = require('./bot.js');
 
 
 /*********************************************************
