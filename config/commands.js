@@ -897,6 +897,233 @@ reminders: 'reminder',
 		);
 	},
 
+	
+/*********************************************************
+	 * Clan commands
+	 *********************************************************/
+
+	clanhelp: function () {
+		if (!this.canBroadcast()) return false;
+		this.sendReplyBox(
+			"Basic Commands<br />" +
+			"/clan [Clan Name] - Displays the information of a clan.<br />" +
+			"/clans - Displays information for all registered clans.<br />" +
+			"Admin Commands<br />" +
+			"/makeclan &lt;name> - make a clan.<br />" +
+			"/closeclan &lt;name> - Close a clan.<br />" +
+			"/addmember &lt;clan>, &lt;user> - Add a member in a clan.<br />" +
+			"/leavemember &lt;clan>, &lt;user> - Leave a member on the current clan<br />" +
+			"/setclanlogo &lt;clan>, &lt;uri> - Sets the clan's logo.<br />" +
+			"/setclandesc &lt;clan>, &lt;description> - Sets the clan's description.<br />" +
+			"War Commands<br />" +
+			"/cwdisp - Marked as available to a user to participate in clan wars.<br />" +
+			"/makerwar &lt;clan 1>, &lt;clan 2> - Start a war between two clans.<br />" +
+			"/finishwar &lt;clan> - It ends a war forced<br />" +
+			"/cwbattles &lt;clan> - Displays battles of the war that have not begun.<br />"
+		);
+	},
+
+	makeclan: function (target) {
+		if (!this.can('clans')) return false;
+		if (target.length < 2)
+			this.sendReply("The name of the clan is too short.");
+		else if (!Clans.createClan(target))
+			this.sendReply("Unable to create the clan. A clan with that name already exists ?.");
+		else
+			this.sendReply(" Clan " + target + "was created");
+	},
+
+	closeclan: function (target) {
+		if (!this.can('clans')) return false;
+		if (!Clans.deleteClan(target))
+			this.sendReply("Unable to delete the clan. This clan wars right now playing ?.");
+		else
+			this.sendReply("The Clan " + target + " has been erased");
+	},
+
+	clan: 'getclans',
+	clanes: 'getclans',
+	getclan: 'getclans',
+	getclans: function (target) {
+		if (!this.canBroadcast()) return false;
+
+		var clan = Clans.getRating(target);
+		if (!clan) {
+			var clanName = Clans.findClanFromMember(target);
+			if (clanName) {
+				target = clanName;
+				clan = Clans.getRating(clanName);
+			}
+		}
+		if (!clan && target.length > 0) {
+			var clans = Clans.getClans().map(toId).sort();
+			var targetId = toId(target);
+			for (var c = 0; c < clans.length; ++c)
+				if (clans[c].slice(0, targetId.length) === targetId) {
+					target = clans[c];
+					clan = Clans.getRating(clans[c]);
+					break;
+				}
+		}
+		if (!clan && target.length > 0) {
+			this.sendReply("No clan or clan member found under '" + target + "'.");
+			return;
+		}
+		if (!clan) {
+			this.sendReply('|raw|' +
+				"<center>" +
+					
+					"<div class=\"clans-info\">" +
+						"<strong>Clans:</strong><br />" +
+						Clans.getClans().map(function (clan) {
+							var result = Clans.getRating(clan);
+							result.name = clan;
+							return result;
+						}).sort(function (a, b) {
+							return b.rating - a.rating;
+						}).map(function (clan) {
+							var buffer = "";
+							if (Rooms.get(toId(clan.name)))
+								buffer += '<a class="ilink" href="/' + toId(clan.name) + '"><strong>' + Tools.escapeHTML(clan.name) + '</strong></a>: ';
+							else
+								buffer += '<strong>' + Tools.escapeHTML(clan.name) + '</strong>: ';
+							return buffer + clan.ratingName + " (" + clan.rating + ") " + clan.wins + "/" + clan.losses + "/" + clan.draws;
+						}).join('<br />') +
+					"</div>" +
+					
+				"</center>"
+			);
+			return;
+		}
+
+		var info = Clans.getClanInfo(target);
+		this.sendReply('|raw|' +
+			"<center>" +
+				
+				"<div class=\"clan-info\">" +
+					'<h1>' + Tools.escapeHTML(Clans.getClanName(target)) + '</h1>' +
+					(info.logo ? '<img src="' + encodeURI(info.logo) + '" />' : '') +
+					(info.description ? '<p>' + Tools.escapeHTML(info.description) + '</p>' : '') +
+					'<hr />' +
+					"<strong>Ranking:</strong> " + clan.ratingName + "<br />" +
+					"<strong>Points:</strong> " + clan.rating + "<br />" +
+					"<strong>War Wins:</strong> " + clan.wins + " / <strong>War missed:</strong> " + clan.losses + " / <strong>Empates:</strong> " + clan.draws + '<br />' +
+					"<strong>Members:</strong> " + Tools.escapeHTML(Clans.getMembers(target).sort().join(", ")) +
+					(Rooms.get(toId(target)) ? '<br /><button name="joinRoom" value="' + toId(target) + '">To Room</button>' : '') +
+				"</div>" +
+				
+			"</center>"
+		);
+	},
+
+	addmember: function (target) {
+		if (!this.can('clans')) return false;
+		var params = target.split(',');
+		if (params.length !== 2) return this.sendReply("Uso: /addmember clan, member");
+
+		var user = Users.getExact(params[1]);
+		if (!user || !user.connected) return this.sendReply("User: " + params[1] + " is not online.");
+
+		if (!Clans.addMember(params[0], params[1]))
+			this.sendReply("Could not add the user to the clan. Does the clan exist or is the user already in another clan?");
+		else {
+			this.sendReply("User: " + user.name + " successfully added to the clan.");
+			Rooms.rooms.lobby.add('|raw|<div class="clans-user-join">' + Tools.escapeHTML(user.name) + " has joined the clan: " + Tools.escapeHTML(Clans.getClanName(params[0])) + '</div>');
+		}
+	},
+
+	leavemember: function (target) {
+		if (!this.can('clans')) return false;
+		var params = target.split(',');
+		if (params.length !== 2) return this.sendReply("Uso: /leavemember clan, member");
+
+		if (!Clans.removeMember(params[0], params[1]))
+			this.sendReply("Could not remove the user from the clan. Does the clan exist or has the user already been removed from it?");
+		else {
+			this.sendReply("User: " + params[1] + " successfully removed from the clan.");
+			Rooms.rooms.lobby.add('|raw|<div class="clans-user-join">' + Tools.escapeHTML(params[1]) + " has left the clan: " + Tools.escapeHTML(Clans.getClanName(params[0])) + '</div>');
+		}
+	},
+
+	setclanlogo: function (target) {
+		if (!this.can('clans')) return false;
+		var params = target.split(',');
+		if (params.length !== 2) return this.sendReply("Usage: /setclanlogo clan, url");
+
+		var info = Clans.getClanInfo(params[0]);
+		if (!info)
+			this.sendReply("Could not get clan info. Does the clan exist?");
+		else {
+			info.logo = params[1].trim();
+			Clans.writeClansData();
+			this.sendReply("Clan logo successfully changed.");
+		}
+	},
+
+	setclandesc: function (target) {
+		if (!this.can('clans')) return false;
+		var params = target.split(',');
+		if (params.length !== 2) return this.sendReply("Usage: /setclanlogo clan, description");
+
+		var info = Clans.getClanInfo(params[0]);
+		if (!info)
+			this.sendReply("Could not get clan info. Does the clan exist?");
+		else {
+			info.description = params[1].trim();
+			Clans.writeClansData();
+			this.sendReply("Clan description successfully changed.");
+		}
+	},
+
+	cwdisp: function (target, room, user) {
+		user.isClanWarAvailable = Date.now();
+		this.sendReply("You have been marked as available to play clan wars.");
+	},
+
+	makewar: function (target, room) {
+		if (!this.can('clans')) return false;
+		var params = target.split(',');
+		if (params.length !== 2) return this.sendReply("Use: /makewar clan 1, clan 2");
+
+		var matchups = Clans.startWar(params[0], params[1], room);
+		if (!matchups) return this.sendReply("Could not start the war. Participants have to write /makewar.");
+
+		room.add('|raw|' +
+			"<div class=\"clans-war-start\">The Clan War between " + Tools.escapeHTML(Clans.getClanName(params[0])) + " and " + Tools.escapeHTML(Clans.getClanName(params[1])) + " It has begun!</div>" +
+			Object.keys(matchups).map(function (m) { return "<strong>" + Tools.escapeHTML(matchups[m].from) + "</strong> VS <strong>" + Tools.escapeHTML(matchups[m].to); }).join('<br />')
+		);
+	},
+
+	finishwar: function (target) {
+		if (!this.can('clans')) return false;
+		var war = Clans.findWarFromClan(target);
+		if (!war) return this.sendReply("The clan war does not exist. It has already been completed ?.");
+
+		var room = Clans.getWarRoom(target);
+		Clans.endWar(target);
+		room.add("|raw|<div class=\"clans-war-end\"> The clan war between" + Tools.escapeHTML(war[0]) + " and " + Tools.escapeHTML(war[1]) + " has been completed.</div>");
+		this.sendReply("La guerra de clanes ha sido finalizada.");
+	},
+
+	cwbattles: function (target) {
+		if (!this.canBroadcast()) return false;
+		var war = Clans.findWarFromClan(target);
+		if (!war) return this.sendReply("The clan war does not exist.");
+
+		var matchups = Clans.getWarMatchups(target);
+		this.sendReplyBox(
+			"<strong>Clan war matchups between " + Tools.escapeHTML(war[0]) + " and " + Tools.escapeHTML(war[1]) + ':</strong><br />' +
+			Object.keys(matchups).map(function (m) { return matchups[m].isEnded ? "" : '<strong>' + Tools.escapeHTML(matchups[m].from) + "</strong> vs <strong>" + Tools.escapeHTML(matchups[m].to); }).join('<br />')
+		);
+	},	
+	
+	
+	
+	
+	
+	
+	
+	
 	rule: 'rules',
 	rules: function (target, room, user) {
 		if (!target) {
