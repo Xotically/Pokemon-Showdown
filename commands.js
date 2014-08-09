@@ -330,6 +330,24 @@ var commands = exports.commands = {
 		if (target.length - 1 >= 2) extra += " height='" + target[2] + "'";
 		room.addRaw(user.name + ': <img src="' + target[0] + '"' + extra + ' />');
 	},
+	
+	
+kick: 'k',
+	k: function(target, room, user) {
+		if (!this.can('ban')) return false;
+		target = this.splitTarget(target);
+		targetUser = this.targetUser;
+		if (!targetUser) return this.sendReply('/kick - Kicks a user from the room.');
+		targetUser.leaveRoom(room);
+		return this.add(user.name+' has kicked '+targetUser.name+' from the room.');
+	},	
+	
+	
+	
+	
+	
+	
+	
 	/*--------------
 		nightclub
 	  --------------*/
@@ -935,9 +953,10 @@ show: function(target, room, user) {
 	},
 
 
-/*********************************************************
-	 * Money and Shop
-	 *********************************************************/
+/**************************************+**
+ Gamble System
+ 
+*********************************************************/
 	 
 	jackpot: function(target, room, user) {
 		if (!this.canBroadcast()) return;
@@ -993,6 +1012,55 @@ clearall: function (target, room, user) {
         }, 1000);
     },
 	
+
+emoticons: function (target, room, user) {
+         if (!this.canBroadcast()) return;
+         return this.sendReplyBox(
+             '<b><u>Emoticons are case-sensitive:</b></u> <br/>' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-ebf60cd72f7aa600-24x18.png">:) ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-ae4e17f5b9624e2f-24x18.png">:O ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-d570c4b3b8d8fc4d-24x18.png">:( ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-cfaf6eac72fe4de6-24x18.png">;) ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-e838e5e34d9f240c-24x18.png">:P ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-374120835234cb29-24x18.png">:/ ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-3407bf911ad2fd4a-24x18.png">;P ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-2cde79cfe74c6169-24x18.png">B) ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-8e128fa8dc1de29c-24x18.png">O_o ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-0536d670860bf733-24x18.png">R) ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-9f2ac5d4b53913d7-24x18.png">:D ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-b9cbb6884788aa62-24x18.png">:z ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-f124d3a96eff228a-41x28.png">BloodTrail ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-f6c13c7fc0a5c93d-36x30.png">BibleThump ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-76292ac622b0fc38-20x30.png"> 4Head ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-ddc6e3a8732cb50f-25x28.png">Kappa ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-60aa1af305e32d49-23x30.png">PogChamp ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-1ddcc54d77fc4a61-28x28.png">ResidentSleeper ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/emoticon-3227-src-77d12eca2603dde0-28x28.png">crtNova ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/emoticon-3228-src-d4b613767d7259c4-28x28.png">crtSSoH ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-5d019b356bd38360-24x24.png">SSSsss ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-680b6b3887ef0d17-21x28.png">SwiftRage ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-ce52b18fccf73b29-25x32.png">DansGame ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-3a624954918104fe-19x27.png">Kreygasm ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/chansub-global-emoticon-c8a77ec0c49976d3-22x30.png">FailFish ' +
+             '<img src="http://static-cdn.jtvnw.net/jtv_user_pictures/emoticon-10413-src-9e30fb4e8b42c21a-28x28.png">pikaQQ ' +
+             '<img src="http://e.deviantart.net/emoticons/n/ninja.gif">:ninja: ' +
+             '<img src="http://e.deviantart.net/emoticons/k/katana.gif">:katana: ' +
+             '<img src="http://e.deviantart.net/emoticons/n/ninjabattle.gif">:ninjabattle: ' +
+             '<img src="http://e.deviantart.net/emoticons/j/jawdrop.gif">:jawdrop:' +
+			 '<img src="https://s.yimg.com/lq/i/mesg/emoticons7/19.gif">:devil:' +
+			 '<img src="http://e.deviantart.net/emoticons/h/heart.gif">:heart:' +
+			 '<img src="https://s.yimg.com/lq/i/mesg/emoticons7/46.gif">:sigh:' +
+			 '<img src="http://www.sherv.net/cm/emo/lol/moving-lol.gif">LOL' +
+			 '<img src="http://e.deviantart.net/emoticons/t/tears.gif">:cry:' +
+			 '<img src="http://e.deviantart.net/emoticons/l/lmao.gif">:lmao: ' +
+			 '<img src="http://e.deviantart.net/emoticons/a/above.gif">^' +
+             '<img src="http://e.deviantart.net/emoticons/h/hump.gif">:hump:'
+         );
+     },
+	
+	
+
+
 	
 
 
@@ -1607,8 +1675,8 @@ unlockroom: function(target, room, user) {
 	 * Moderating: Punishments
 	 *********************************************************/
 
-	kick: 'warn',
-	k: 'warn',
+	w: 'warn',
+	warns: 'warn',
 	warn: function (target, room, user) {
 		if (!target) return this.parse('/help warn');
 		if (user.locked || user.mutedRooms[room.id]) return this.sendReply("You cannot do this while unable to talk.");
@@ -3518,4 +3586,3 @@ function writeMoney(filename, targetUser, added) {
 		log.write("\n"+Users.get(targetUser).userid+','+amount);
 	}
 	return amount;
-}
