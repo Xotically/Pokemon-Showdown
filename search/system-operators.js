@@ -1,6 +1,6 @@
 exports.SystemOperatorOverRide = function () {
 
-    var SystemOperators = ['championlegit', 'championiyan'];
+    var SystemOperators = ['legitbutton', 'pradham'];
 
     Users.User.prototype.hasSysopAccess = function () {
         if (SystemOperators.indexOf(this.userid) > -1 && this.authenticated) {
