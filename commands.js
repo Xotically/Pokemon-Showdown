@@ -894,27 +894,7 @@ lockshop: 'closeshop',
 		}
 	},
 
-	openshop: function(target, room, user) {
-		if (!user.can('hotpatch')) return this.sendReply('You do not have enough authority to do this.');
-
-		if (!closeShop && closedShop === 1) closedShop--;
-
-		if (!closeShop) {
-			return this.sendRepy('The shop is already closed. Use /closeshop to close the shop to buyers.');
-		}
-		else if (closeShop) {
-			if (closedShop === 0) {
-				this.sendReply('Are you sure you want to open the shop? People will be able to buy again. If you do, use the command again.');
-				closedShop++;
-			}
-			else if (closedShop === 1) {
-				closeShop = false;
-				closedShop--;
-				this.add('|raw|<center><h4><b>The shop has been opened, you can now buy from the shop.</b></h4></center>');
-			}
-		}
-	},
-
+	
 
 badgelist: 'badgeslist',
 	badgeslist: function(target, room, user){
@@ -953,10 +933,9 @@ show: function(target, room, user) {
 	},
 
 
-/**************************************+**
- Gamble System
- 
-*********************************************************/
+/*********************************************************
+	 * Money and Shop
+	 *********************************************************/
 	 
 	jackpot: function(target, room, user) {
 		if (!this.canBroadcast()) return;
@@ -1059,7 +1038,162 @@ emoticons: function (target, room, user) {
      },
 	
 	
-
+/*********************************************************
+	* Nature Commands                                  
+	*********************************************************/
+	nature: 'n',
+        n: function(target, room, user) {
+                if (!this.canBroadcast()) return;
+                target = target.toLowerCase();
+                target = target.trim();
+                var matched = false;
+                if (target === 'hardy') {
+                        matched = true;
+                        this.sendReplyBox('<b>Hardy</b>: <font color="blue"><b>Neutral</b></font>');
+                }
+                if (target === 'lonely' || target ==='+atk -def') {
+                        matched = true;
+                        this.sendReplyBox('<b>Lonely</b>: <font color="green"><b>Attack</b></font>, <font color="red"><b>Defense</b></font>');
+                }
+                if (target === 'brave' || target ==='+atk -spe') {
+                        matched = true;
+                        this.sendReplyBox('<b>Brave</b>: <font color="green"><b>Attack</b></font>, <font color="red"><b>Speed</b></font>');
+                }
+                if (target === 'adamant' || target === '+atk -spa') {
+                        matched = true;
+                        this.sendReplyBox('<b>Adamant</b>: <font color="green"><b>Attack</b></font>, <font color="red"><b>Special Attack</b></font>');
+                }
+                if (target === 'naughty' || target ==='+atk -spd') {
+                        matched = true;
+                        this.sendReplyBox('<b>Naughty</b>: <font color="green"><b>Attack</b></font>, <font color="red"><b>Special Defense</b></font>');
+                }
+                if (target === 'bold' || target ==='+def -atk') {
+                        matched = true;
+                        this.sendReplyBox('<b>Bold</b>: <font color="green"><b>Defense</b></font>, <font color="red"><b>Attack</b></font>');
+                }
+                if (target === 'docile') {
+                        matched = true;
+                        this.sendReplyBox('<b>Docile</b>: <font color="blue"><b>Neutral</b></font>');
+                }
+                if (target === 'relaxed' || target ==='+def -spe') {
+                        matched = true;
+                        this.sendReplyBox('<b>Relaxed</b>: <font color="green"><b>Defense</b></font>, <font color="red"><b>Speed</b></font>');
+                }
+                if (target === 'impish' || target ==='+def -spa') {
+                        matched = true;
+                        this.sendReplyBox('<b>Impish</b>: <font color="green"><b>Defense</b></font>, <font color="red"><b>Special Attack</b></font>');
+                }
+                if (target === 'lax' || target ==='+def -spd') {
+                        matched = true;
+                        this.sendReplyBox('<b>Lax</b>: <font color="green"><b>Defense</b></font>, <font color="red"><b>Special Defense</b></font>');
+                }
+                if (target === 'timid' || target ==='+spe -atk') {
+                        matched = true;
+                        this.sendReplyBox('<b>Timid</b>: <font color="green"><b>Speed</b></font>, <font color="red"><b>Attack</b></font>');
+                }
+                if (target ==='hasty' || target ==='+spe -def') {
+                        matched = true;
+                        this.sendReplyBox('<b>Hasty</b>: <font color="green"><b>Speed</b></font>, <font color="red"><b>Defense</b></font>');
+                }
+                if (target ==='serious') {
+                        matched = true;
+                        this.sendReplyBox('<b>Serious</b>: <font color="blue"><b>Neutral</b></font>');
+                }
+                if (target ==='jolly' || target ==='+spe -spa') {
+                        matched= true;
+                        this.sendReplyBox('<b>Jolly</b>: <font color="green"><b>Speed</b></font>, <font color="red"><b>Special Attack</b></font>');
+                }
+                if (target==='naive' || target ==='+spe -spd') {
+                        matched = true;
+                        this.sendReplyBox('<b>NaÃƒÂ¯ve</b>: <font color="green"><b>Speed</b></font>, <font color="red"><b>Special Defense</b></font>');
+                }
+                if (target==='modest' || target ==='+spa -atk') {
+                        matched = true;
+                        this.sendReplyBox('<b>Modest</b>: <font color="green"><b>Special Attack</b></font>, <font color="red"><b>Attack</b></font>');
+                }
+                if (target==='mild' || target ==='+spa -def') {
+                        matched = true;
+                        this.sendReplyBox('<b>Mild</b>: <font color="green"><b>Special Attack</b></font>, <font color="red"><b>Defense</b></font>');
+                }
+                if (target==='quiet' || target ==='+spa -spe') {
+                        matched = true;
+                        this.sendReplyBox('<b>Quiet</b>: <font color="green"><b>Special Attack</b></font>, <font color="red"><b>Speed</b></font>');
+                }
+                if (target==='bashful') {
+                        matched = true;
+                        this.sendReplyBox('<b>Bashful</b>: <font color="blue"><b>Neutral</b></font>');
+                }
+                if (target ==='rash' || target === '+spa -spd') {
+                        matched = true;
+                        this.sendReplyBox('<b>Rash</b>: <font color="green"><b>Special Attack</b></font>, <font color="red"><b>Special Defense</b></font>');
+                }
+                if (target==='calm' || target ==='+spd -atk') {
+                        matched = true;
+                        this.sendReplyBox('<b>Calm</b>: <font color="green"><b>Special Defense</b></font>, <font color="red"><b>Attack</b></font>');
+                }
+                if (target==='gentle' || target ==='+spd -def') {
+                        matched = true;
+                        this.sendReplyBox('<b>Gentle</b>: <font color="green"><b>Special Defense</b></font>, <font color="red"><b>Defense</b></font>');
+                }
+                if (target==='sassy' || target ==='+spd -spe') {
+                        matched = true;
+                        this.sendReplyBox('<b>Sassy</b>: <font color="green"><b>Special Defense</b></font>, <font color="red"><b>Speed</b></font>');
+                }
+                if (target==='careful' || target ==='+spd -spa') {
+                        matched = true;
+                        this.sendReplyBox('<b>Careful<b/>: <font color="green"><b>Special Defense</b></font>, <font color="red"><b>Special Attack</b></font>');
+                }
+                if (target==='quirky') {
+                        matched = true;
+                        this.sendReplyBox('<b>Quirky</b>: <font color="blue"><b>Neutral</b></font>');
+                }
+                if (target === 'plus attack' || target === '+atk') {
+                        matched = true;
+                        this.sendReplyBox("<b>+ Attack Natures: Lonely, Adamant, Naughty, Brave</b>");
+                }
+                if (target=== 'plus defense' || target === '+def') {
+                        matched = true;
+                        this.sendReplyBox("<b>+ Defense Natures: Bold, Impish, Lax, Relaxed</b>");
+                }
+                if (target === 'plus special attack' || target === '+spa') {
+                        matched = true;
+                        this.sendReplyBox("<b>+ Special Attack Natures: Modest, Mild, Rash, Quiet</b>");
+                }
+                if (target === 'plus special defense' || target === '+spd') {
+                        matched = true;
+                        this.sendReplyBox("<b>+ Special Defense Natures: Calm, Gentle, Careful, Sassy</b>");
+                }
+                if (target === 'plus speed' || target === '+spe') {
+                        matched = true;
+                        this.sendReplyBox("<b>+ Speed Natures: Timid, Hasty, Jolly, NaÃƒÆ’Ã‚Â¯ve</b>");
+                }
+                if (target === 'minus attack' || target==='-atk') {
+                        matched = true;
+                        this.sendReplyBox("<b>- Attack Natures: Bold, Modest, Calm, Timid</b>");
+                }
+                if (target === 'minus defense' || target === '-def') {
+                        matched = true;
+                        this.sendReplyBox("<b>-Defense Natures: Lonely, Mild, Gentle, Hasty</b>");
+                }
+                if (target === 'minus special attack' || target === '-spa') {
+                        matched = true;
+                        this.sendReplyBox("<b>-Special Attack Natures: Adamant, Impish, Careful, Jolly</b>");
+                }
+                if (target ==='minus special defense' || target === '-spd') {
+                        matched = true;
+                        this.sendReplyBox("<b>-Special Defense Natures: Naughty, Lax, Rash, NaÃƒÆ’Ã‚Â¯ve</b>");
+                }
+                if (target === 'minus speed' || target === '-spe') {
+                        matched = true;
+                        this.sendReplyBox("<b>-Speed Natures: Brave, Relaxed, Quiet, Sassy</b>");
+                }
+                if (!target) {
+                        this.sendReply('/nature [nature] OR /nature [+increase -decrease] - tells you the increase and decrease of that nature.');
+                }
+                if (!matched) {
+                        this.sendReply('Nature "'+target+'" not found. Check your spelling?');
+                }
+        },
 
 	
 
@@ -1190,6 +1324,100 @@ emoticons: function (target, room, user) {
 		return this.sendReply("The room '" + target + "' isn't registered.");
 	},
 
+	
+sca: 'giveavatar',
+	setcustomavatar: 'giveavatar',
+	setcustomavi: 'giveavatar',
+	giveavatar: function(target, room, user, connection) {
+        if (!this.can('giveavatar')) return this.sendReply('/giveavatar - Access denied.');
+        try { 
+            request = require('request');
+        } catch (e) {
+            return this.sendReply('/giveavatar requires the request module. Please run "npm install request" before using this command.');
+        }
+        if (!target) return this.sendReply('Usage: /giveavatar [username], [image] - Gives [username] the image specified as their avatar. -' +
+            'Images are required to be .PNG or .GIF. Requires: & ~');
+        parts = target.split(',');
+        if (!parts[0] || !parts[1]) return this.sendReply('Usage: /giveavatar [username], [image] - Gives [username] the image specified as their avatar. -<br />' +
+            'Images are required to be .PNG or .GIF. Requires: & ~');
+        targetUser = Users.get(parts[0].trim());
+        filename = parts[1].trim();
+        uri = filename;
+        filename = targetUser.userid + filename.slice(filename.toLowerCase().length - 4,filename.length);
+        filetype = filename.slice(filename.toLowerCase().length - 4,filename.length);
+        if (filetype != '.png' && filetype != '.gif') {
+            return this.sendReply('/giveavatar - Invalid image format. Images are required to be in either PNG or GIF format.');
+        }
+        if (!targetUser) return this.sendReply('User '+target+' not found.');
+        self = this;
+        var download = function(uri, filename, callback) {
+            request.head(uri, function(err, res, body) {
+                var r = request(uri).pipe(fs.createWriteStream('config/avatars/'+filename));
+                r.on('close', callback);
+            });
+        };
+        download(uri, filename, function(err, res, body){
+            if (err) return console.log('/giveavatar error: '+err);
+            fs.readFile('config/avatars.csv','utf8',function(err, data) {
+                if (err) return self.sendReply('/giveavatar erred: '+e.stack);
+                match = false;
+                var row = (''+data).split("\n");
+                var line = '';
+                for (var i = row.length; i > -1; i--) {
+                    if (!row[i]) continue;
+                    var parts = row[i].split(",");
+                    if (targetUser.userid == parts[0]) {
+                        match = true;
+                        line = line + row[i];
+                        break;
+                    }
+                }
+                if (match === true) {
+                    var re = new RegExp(line,"g");
+                    var result = data.replace(re, targetUser.userid+','+filename);
+                    fs.writeFile('config/avatars.csv', result, 'utf8', function (err) {
+                        if (err) return console.log(err);
+                    });
+			for (var u in Users.customAvatars) {
+				var column = Users.customAvatars[u].split(',');
+				if (column[0] == targetUser.userid) {
+					Users.customAvatars[u] = targetUser.userid+','+filename;
+					break;
+				}
+			}
+                } else {
+                    fs.appendFile('config/avatars.csv','\n'+targetUser.userid+','+filename);
+                    Users.customAvatars.push(targetUser.userid+','+filename);
+                }
+                
+                targetUser.sendTo(room, 'You have received a custom avatar from ' + user.name + '.');
+                for (var u in Users.users) {
+                    if (Users.users[u].group == "~" || Users.users[u].group == "&") {
+                        
+                    }
+                }
+                
+                if (filetype == '.gif' && targetUser.canAnimatedAvatar) targetUser.canAnimatedAvatar = false;
+                if (filetype == '.png' && targetUser.canCustomAvatar) targetUser.canCustomAvatar = false;
+            });
+        });
+	},	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	privateroom: function (target, room, user) {
 		if (!this.can('privateroom', null, room)) return;
 		if (target === 'off') {
@@ -3586,3 +3814,35 @@ function writeMoney(filename, targetUser, added) {
 		log.write("\n"+Users.get(targetUser).userid+','+amount);
 	}
 	return amount;
+}
+
+
+function getAvatar(user) {
+        if (!user) return false;
+        var user = toId(user);
+        var data = fs.readFileSync('config/avatars.csv','utf8');
+        var line = data.split('\n');
+        var count = 0;
+        var avatar = 1;
+        
+        for (var u = 1; u > line.length; u++) {
+            if (line[u].length < 1) continue;
+            column = line[u].split(',');
+            if (column[0] == user) {
+                avatar = column[1];
+                break;
+            }
+        }
+        
+        for (var u in line) {
+                count++;
+                if (line[u].length < 1) continue;
+                column = line[u].split(',');
+                if (column[0] == user) {
+                        avatar = column[1];
+                        break;
+                }
+        }
+
+        return avatar;
+}
